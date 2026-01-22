@@ -25,7 +25,7 @@ User need to set up the input parameters such as :
 docker run --rm \
   -v path_of_input:/input \
   -v path_of_output:/output \
-  nlmced:latest python nlmced.py [iter] [rho] [alpha]
+  nlmced:latest [iter] [rho] [alpha]
 ```
 Where:
 * path_of_input: Directory containing the original DICOM images for each patient
