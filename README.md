@@ -1,8 +1,5 @@
 # Non Local mean Coherence Enhancing Diffusion filter (NLmCED)
 ## Tool Overview
-
-Tool Overview
-
 The NLmCED filter is a hybrid denoising method that combines Non-Local Means (NLM) filtering with Coherence-Enhancing Anisotropic Diffusion, incorporating a Rician noise estimator for MRI images.
 
 The NLM filter exploits the similarity between image patches to reduce noise by replacing each pixel with a weighted average of similar patches across the image. This approach effectively suppresses noise while preserving edges and fine structural details.
