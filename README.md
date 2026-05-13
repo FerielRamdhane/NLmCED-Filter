@@ -38,5 +38,5 @@ Where:
 This repository is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)](LICENSE). You may use and share the content non-commercially, with proper attribution, but you may not modify or create derivative works.
 
 ## Organization
-[Euro-BioImaging](https://www.eurobioimaging.eu) · [Institute of Biostructures and Bioimaging (IBB) of the National Research Council (CNR)](https://www.ibb.cnr.it) · [University of Tunis](https://utm.rnu.tn/utm/fr)
+[Euro-BioImaging](https://www.eurobioimaging.eu) · [Institute of Biostructures and Bioimaging (IBB) of the National Research Council (CNR)](https://www.ibb.cnr.it) · [University of Tunis El Manar](https://utm.rnu.tn/utm/fr)
 
