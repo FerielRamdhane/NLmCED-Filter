@@ -11,5 +11,5 @@ echo "Output directory: $OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
 echo "=== Starting NLmCED ==="
-python /app/nlmced.py "$@"
+python /app/nlmced.py "$INPUT_DIR" "$OUTPUT_DIR" "$@"
 echo "=== Completed NLmCED Denoising ==="
