@@ -20,17 +20,60 @@ User need to set up the input parameters such as :
 * ρ = 0.01
 * α = 0.01
 
+## Usage on EUCAIM
+```bash
+jobman submit -i nlmced -- <input_dir> <output_dir> [iter] [rho] [alpha]
+```
+
 ## Docker Image Usage
 ```bash
 docker run --rm \
   -v path_of_input:/input \
   -v path_of_output:/output \
-  nlmced:latest [iter] [rho] [alpha]
+  nlmced:1.1.0 [iter] [rho] [alpha]
 ```
-Where:
-* path_of_input: Directory containing the original DICOM images for each patient
+or with explicit folders:
+```bash
+docker run --rm -v path_of_input:/data/in -v path_of_output:/data/out \
+  nlmced:1.1.0 /data/in /data/out [iter] [rho] [alpha]
+```
 
-* path_of_output: Directory where the NLmCED-denoised DICOM images will be saved
+## Input data
+* **3D series**: the whole volume is filtered at once.
+* **4D series** (e.g. CEST Z-spectrum, dynamic or multi-echo acquisitions, stored as one file per slice per volume): the images are grouped by slice position and each 3D volume is filtered separately with the same parameters. Each volume is normalised by its own maximum before filtering and scaled back by the same value afterwards, so the relative intensities between volumes are preserved.
+* Enhanced multi-frame DICOM (all frames in one file) is not supported yet.
+
+## Outputs
+* `*_NLmCED.dcm`: the denoised images, saved as a new DICOM series (new SeriesInstanceUID, same geometry).
+* `NLmCED_images/`: preview JPGs per slice (original, filtered, residual); one sub-folder per volume for 4D data.
+
+## Memory and parallel workers
+The filter uses a MATLAB parallel pool; each worker is a separate MATLAB process. To avoid running out of memory, the number of workers is limited to **2** by default. Set the environment variable `NLMCED_MAX_WORKERS` to change it (`0` = one worker per CPU core), e.g. `docker run -e NLMCED_MAX_WORKERS=4 ...`.
+
+## Changelog
+* **1.1.0**: support for 4D series (per-volume filtering); fixed slice ordering when InstanceNumber does not start at 1; one SeriesInstanceUID / FrameOfReferenceUID for the whole denoised series; output keeps the original pixel type; input/output folders can be passed as arguments (EUCAIM jobman); parallel workers limited (default 2) to avoid out-of-memory; image reduced from 11.1 GB (minimal MATLAB Runtime, multi-stage build); container runs as the `eucaim` user (UID/GID 2323).
+* **1.0**: first release.
+
+## Repository layout
+```
+src/       core code (nlmced.py), Python requirements, compiled MATLAB package - shared by both images
+eucaim/    self-contained image (minimal MATLAB Runtime installed in the build, UID 2323) - published on EUCAIM Harbor
+xnat/      XNAT Container Service image: built on the shared MATLAB Runtime base used by all XNAT tools,
+           adds upload to XNAT and the dashboard outputs (nlmced_xnat.py, command.json)
+```
+
+## Building the images
+Both images are built from the repository root and always get the version written in `src/nlmced.py`.
+
+**EUCAIM (self-contained)**
+`./build.sh eucaim`  → `nlmced:<version>`. The minimal MATLAB Runtime (R2024b Update 5, same products as the
+shared XNAT runtime base) is installed during the build from MathWorks' runtime installer image;
+no MATLAB installation is needed.
+
+**XNAT**
+`./build.sh xnat`  → `nlmced-xnat:<version>`, on top of the shared base `mcr-riciannoiselevel:r2024b`
+(another base can be given with `MCR_BASE=<image> ./build.sh xnat`). Then register `xnat/command.json` in the Container Service.
+
 ## Citation
 [1] F. Romdhane, F. Benzarti, A. Hamid, A new method for three-dimensional magnetic resonance images denoising. International Journal of Computational Vision and Robotics 2018 8:1, 1-17. DOI:10.1504/IJCVR.2018.090012
 

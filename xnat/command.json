@@ -1,0 +1,210 @@
+{
+  "name": "NLmCED_filter",
+  "label": "NLmCED_filter",
+  "description": "The NLmCED (Non Local mean Coherence Enhancing Diffusion) filter is a denoising tool aimed to reduce Rician Noise in 3D MR images. It is a combination between two filters such as the Non-Local mean filter and the Anisotropic Diffusion tensor method with an estimator of Rician noise. The NLmCED filter can benefit from the noise reduction capabilities of the NLM filter while maintaining the edge-preserving characteristics of anisotropic diffusion.",
+  "version": "1.1.0",
+  "schema-version": "1.0",
+  "image": "nlmced-xnat:1.1.0",
+  "type": "docker",
+  "command-line": "python3.10 /app/nlmced_xnat.py #iter# #rho# #alpha# #SCAN# #SUBJECT# #SESSION# #PROJECT#",
+  "override-entrypoint": true,
+  "mounts": [
+    {
+      "name": "dicom-in",
+      "writable": false,
+      "path": "/input"
+    },
+    {
+      "name": "filter-out",
+      "writable": true,
+      "path": "/output"
+    },
+    {
+      "name": "mount",
+      "writable": true,
+      "path": "/mount"
+    }
+  ],
+  "environment-variables": {},
+  "ports": {},
+  "inputs": [
+    {
+      "name": "rho",
+      "label": "Rho Parameter",
+      "description": "Rho value: 0 < Rho <= 0.1",
+      "type": "string",
+      "default-value": "0.01",
+      "required": true,
+      "replacement-key": "#rho#",
+      "select-values": []
+    },
+    {
+      "name": "alpha",
+      "description": "Enter Alpha value : 0 < Alpha <= 0.1",
+      "type": "number",
+      "default-value": "0.01",
+      "required": true,
+      "replacement-key": "#alpha#",
+      "select-values": []
+    },
+    {
+      "name": "iter",
+      "description": "Enter the iteration number",
+      "type": "string",
+      "default-value": "1",
+      "required": true,
+      "replacement-key": "#iter#",
+      "select-values": []
+    },
+    {
+      "name": "session",
+      "description": "XNAT ID of the session",
+      "type": "string",
+      "required": true,
+      "replacement-key": "#SESSION#",
+      "select-values": []
+    },
+    {
+      "name": "subject",
+      "description": "XNAT ID of the subject",
+      "type": "string",
+      "required": true,
+      "replacement-key": "#SUBJECT#",
+      "select-values": []
+    },
+    {
+      "name": "project",
+      "description": "XNAT ID of the project",
+      "type": "string",
+      "required": true,
+      "replacement-key": "#PROJECT#",
+      "select-values": []
+    },
+    {
+      "name": "scan",
+      "description": "XNAT ID of the scan",
+      "type": "string",
+      "required": true,
+      "replacement-key": "#SCAN#",
+      "select-values": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "nlmcedmatlab",
+      "description": "NLmCED run folder: MATLAB files and dashboard files (raw arrays, meta.txt, JPGs)",
+      "required": true,
+      "mount": "filter-out"
+    }
+  ],
+  "xnat": [
+    {
+      "name": "NLmCED_filter",
+      "label": "NLmCED_filter",
+      "description": "The NLmCED (Non Local mean Coherence Enhancing Diffusion) filter is a denoising tool aimed to reduce Rician Noise in 3D MR images. It is a combination between two filters such as the Non-Local mean filter and the Anisotropic Diffusion tensor method with an estimator of Rician noise. The NLmCED filter can benefit from the noise reduction capabilities of the NLM filter while maintaining the edge-preserving characteristics of anisotropic diffusion.",
+      "contexts": [
+        "xnat:imageScanData"
+      ],
+      "external-inputs": [
+        {
+          "name": "scan",
+          "description": "Input scan",
+          "type": "Scan",
+          "matcher": "'DICOM' in @.resources[*].label",
+          "required": true,
+          "load-children": true
+        }
+      ],
+      "derived-inputs": [
+        {
+          "name": "scan-dicoms",
+          "description": "The dicom resource on the scan",
+          "type": "Resource",
+          "matcher": "@.label == 'DICOM'",
+          "required": true,
+          "provides-files-for-command-mount": "dicom-in",
+          "load-children": true,
+          "derived-from-wrapper-input": "scan",
+          "multiple": false
+        },
+        {
+          "name": "project",
+          "description": "Project input derived from Scan",
+          "type": "string",
+          "required": true,
+          "provides-value-for-command-input": "project",
+          "load-children": true,
+          "derived-from-wrapper-input": "scan",
+          "derived-from-xnat-object-property": "project-id",
+          "multiple": false
+        },
+        {
+          "name": "session",
+          "description": "Input session",
+          "type": "Session",
+          "required": true,
+          "load-children": true,
+          "derived-from-wrapper-input": "scan",
+          "multiple": false
+        },
+        {
+          "name": "subject",
+          "description": "Subject input derived from Session",
+          "type": "Subject",
+          "required": true,
+          "load-children": true,
+          "derived-from-wrapper-input": "session",
+          "multiple": false
+        },
+        {
+          "name": "subject-label",
+          "description": "The subject's label",
+          "type": "string",
+          "required": true,
+          "provides-value-for-command-input": "subject",
+          "load-children": true,
+          "derived-from-wrapper-input": "subject",
+          "derived-from-xnat-object-property": "label",
+          "multiple": false
+        },
+        {
+          "name": "session-id",
+          "description": "The session's id",
+          "type": "string",
+          "required": true,
+          "provides-value-for-command-input": "session",
+          "load-children": true,
+          "derived-from-wrapper-input": "session",
+          "derived-from-xnat-object-property": "id",
+          "multiple": false
+        },
+        {
+          "name": "scan-id",
+          "description": "The scan's id",
+          "type": "string",
+          "required": true,
+          "provides-value-for-command-input": "scan",
+          "load-children": true,
+          "derived-from-wrapper-input": "scan",
+          "derived-from-xnat-object-property": "id",
+          "multiple": false
+        }
+      ],
+      "output-handlers": [
+        {
+          "name": "nlmcedresource",
+          "accepts-command-output": "nlmcedmatlab",
+          "as-a-child-of": "scan",
+          "type": "Resource",
+          "label": "NLmCED_images",
+          "tags": []
+        }
+      ]
+    }
+  ],
+  "container-labels": {},
+  "generic-resources": {},
+  "ulimits": {},
+  "secrets": [],
+  "visibility": "public"
+}
