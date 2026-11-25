@@ -51,13 +51,13 @@ docker run --rm -v path_of_input:/data/in -v path_of_output:/data/out \
 The filter uses a MATLAB parallel pool; each worker is a separate MATLAB process. To avoid running out of memory, the number of workers is limited to **2** by default. Set the environment variable `NLMCED_MAX_WORKERS` to change it (`0` = one worker per CPU core), e.g. `docker run -e NLMCED_MAX_WORKERS=4 ...`.
 
 ## Changelog
-* **1.1.0**: support for 4D series (per-volume filtering); fixed slice ordering when InstanceNumber does not start at 1; one SeriesInstanceUID / FrameOfReferenceUID for the whole denoised series; output keeps the original pixel type; input/output folders can be passed as arguments (EUCAIM jobman); parallel workers limited (default 2) to avoid out-of-memory; image reduced from 11.1 GB (minimal MATLAB Runtime, multi-stage build); container runs as the `eucaim` user (UID/GID 2323).
+* **1.1.0**: support for 4D series (per-volume filtering); fixed slice ordering when InstanceNumber does not start at 1; one SeriesInstanceUID / FrameOfReferenceUID for the whole denoised series; output keeps the original pixel type; input/output folders can be passed as arguments (EUCAIM jobman); parallel workers limited (default 2) to avoid out-of-memory; image reduced from 11.1 GB (minimal MATLAB Runtime, multi-stage build); container runs as the `eucaim` user.
 * **1.0**: first release.
 
 ## Repository layout
 ```
 src/       core code (nlmced.py), Python requirements, compiled MATLAB package - shared by both images
-eucaim/    self-contained image (minimal MATLAB Runtime installed in the build, UID 2323) - published on EUCAIM Harbor
+eucaim/    self-contained image (minimal MATLAB Runtime installed in the build) - published on EUCAIM Harbor
 xnat/      XNAT Container Service image: built on the shared MATLAB Runtime base used by all XNAT tools,
            adds upload to XNAT and the dashboard outputs (nlmced_xnat.py, command.json)
 ```
